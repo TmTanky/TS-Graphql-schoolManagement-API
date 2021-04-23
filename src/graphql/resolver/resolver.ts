@@ -37,6 +37,34 @@ export const root = {
 
     },
 
+    allUsers: async () => {
+
+        try {
+
+            const allUsers = await User.find({}).populate('subjects')
+
+            return allUsers
+            
+        } catch (err) {
+            return err
+        }
+
+    },
+
+    allSubjects: async () => {
+
+        try {
+
+            const allSubjects = await Subject.find({}).populate('studentsWhoTake')
+
+            return allSubjects
+            
+        } catch (err) {
+            return err
+        }
+
+    },
+
     // Mutations
     createUser: async (args: Iuser) => {
 
@@ -76,6 +104,28 @@ export const root = {
 
     },
 
+    userChangeRole: async (args: {personID: string, newRole: UserRole}) => {
+
+        const { personID, newRole } = args
+
+        if (!Object.values(UserRole).includes(newRole)) {
+            throw new Error ('Invalid Role.')
+        }
+        
+        try {
+
+            const changeRole = await User.findOneAndUpdate({_id: personID}, {
+                role: newRole
+            }, {new: true})
+
+            return changeRole
+            
+        } catch (err) {
+            return err
+        }
+
+    },
+
     createSubject: async (args: Isubject) => {
 
         const { name, description } = args
@@ -101,6 +151,106 @@ export const root = {
                 throw new Error ('Subject name already exist.')
             }
 
+            return err
+        }
+
+    },
+
+    editSubject: async (args: {subjectID: Isubject , newName: string, newDescription: string}) => {
+
+        const { newName, newDescription, subjectID } = args
+
+        try {
+
+            if (newName === "" || newDescription === "") {
+                throw new Error ('Please input all fields.')
+            }
+
+            const toBeEditedSubject3 = await Subject.findOneAndUpdate({_id: subjectID}, {
+                name: newName,
+                description: newDescription
+            }, { new: true })
+
+            return toBeEditedSubject3
+
+            
+        } catch (err) {
+            return err
+        }
+
+    },
+
+    deleteSubject: async (args: { subjectID: string }) => {
+
+        const { subjectID } = args
+
+        try {
+
+            const toBeDeleted = await Subject.findByIdAndDelete(subjectID)
+
+            return toBeDeleted
+
+            
+        } catch (err) {
+            return err
+        }
+
+    },
+
+    studentTakeSubject: async (args: { toTakeSubjects: Isubject[], student: Iuser }) => {
+
+        const { toTakeSubjects, student } = args
+
+        try {
+
+            toTakeSubjects.map(async item => {
+                await Subject.findOneAndUpdate({_id: item}, {
+                    $addToSet: {
+                        studentsWhoTake: student
+                    }
+                })
+            })
+
+            const studentWhoTake = await User.findOneAndUpdate({_id: student}, {
+                $addToSet: {
+                    subjects: { $each: [...toTakeSubjects] }
+                }
+            }, {new: true}).populate('subjects')
+
+            return studentWhoTake
+            
+        } catch (err) {
+            return err
+        }
+
+    },
+    
+    studentRemoveSubject: async (args: { toRemoveSubjects: Isubject[], student: string} ) => {
+
+        const { toRemoveSubjects, student } = args
+
+        try {
+
+            toRemoveSubjects.map(async item => {
+                await Subject.findOneAndUpdate({_id: item}, {
+                    $pull: {
+                        studentsWhoTake: student
+                    }
+                })
+            })
+
+            toRemoveSubjects.map( async item => {
+                const studentWhoTake = await User.findOneAndUpdate({_id: student}, {
+                    $pull: {
+                        subjects: item
+                    }
+                }, {new: false}).populate('subjects')
+
+                return studentWhoTake
+            })
+
+            
+        } catch (err) {
             return err
         }
 
