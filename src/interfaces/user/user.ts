@@ -11,9 +11,9 @@ export interface Iuser extends Document {
     firstName: string;
     middleName: string;
     lastName: string;
-    age: number;
     email: string;
     password: string;
+    passwordConfirm: string
     courseEnrolled: string;
     subjects: Isubject[];
     role: UserRole

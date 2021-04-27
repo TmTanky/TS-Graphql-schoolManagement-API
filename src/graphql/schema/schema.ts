@@ -5,6 +5,13 @@ export const schema = buildSchema(`
         loginUser(email: String!, password: String!): userInfo
         allUsers: [userInfo]
         allSubjects: [subject]
+        allAnnouncements: [announcement]
+    }
+
+    type announcement {
+        _id: ID!
+        title: String!
+        details: String!
     }
 
     type userInfo  {
@@ -12,7 +19,6 @@ export const schema = buildSchema(`
         firstName: String!
         middleName: String!
         lastName: String!
-        age: Int!
         email: String!
         role: String!
         subjects: [subject]
@@ -31,9 +37,9 @@ export const schema = buildSchema(`
             firstName: String!
             middleName: String!
             lastName: String!
-            age: Int!
             email: String!
             password: String!
+            passwordConfirm: String!    
         ): userInfo
 
         userChangeRole(
@@ -64,6 +70,10 @@ export const schema = buildSchema(`
             student: ID!
         ): userInfo
 
+        createAnnouncement(
+            title: String!
+            details: String!
+        ): announcement
 
 
     }

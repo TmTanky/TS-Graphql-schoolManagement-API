@@ -3,9 +3,12 @@ import { hash, compare } from 'bcrypt'
 // Models
 import { User } from '../../models/user/user'
 import { Subject } from '../../models/subjects/subjects'
+import { Announcement } from '../../models/announcement/announcement'
+
+// Interfaces
 import { Iuser, UserRole } from "../../interfaces/user/user"
-import { NextFunction } from "express"
 import { Isubject } from '../../interfaces/subjects/subject'
+import { Iannouncement } from '../../interfaces/announcement/announcement'
 
 export const root = {
 
@@ -14,8 +17,13 @@ export const root = {
     loginUser: async (args: Iuser) => {
 
         const {email, password} = args
+        console.log(email, password)
 
         try {
+
+            if (email === "" || password === "") {
+                throw new Error ('Please input all fields.')
+            }
 
             const loggingInUser = await User.findOne({email})
 
@@ -65,17 +73,39 @@ export const root = {
 
     },
 
+    allAnnouncements: async () => {
+
+        try {
+
+            const allAnnouncements = await Announcement.find({})
+
+            return allAnnouncements
+            
+        } catch (err) {
+            return err
+        }
+
+    },
+
     // Mutations
     createUser: async (args: Iuser) => {
 
-        const {firstName, middleName, lastName, age, email, password } =  args
+        const {firstName, middleName, lastName, email, password, passwordConfirm } =  args
 
         try {
 
             const ifExist = await User.findOne({email: args.email})
 
-            if (firstName === "" || middleName === "" || lastName === "" || age === null || email === "") {
+            if (firstName === "" || middleName === "" || lastName === "" || email === "") {
                 throw new Error ('Please input all fields for user.')
+            }
+
+            if (password.length < 5) {
+                throw new Error ('Password must be 5 characters long.')
+            }
+
+            if (password !== passwordConfirm) {
+                throw new Error ('Password must match.')
             }
 
             if (ifExist) {
@@ -88,7 +118,6 @@ export const root = {
                 firstName,
                 middleName,
                 lastName,
-                age,
                 email,
                 password: hashedPassword,
                 role: UserRole.STUDENT
@@ -249,6 +278,27 @@ export const root = {
                 return studentWhoTake
             })
 
+            
+        } catch (err) {
+            return err
+        }
+
+    },
+
+    createAnnouncement: async (args: Iannouncement ) => {
+
+        const {title, details} = args
+
+        try {
+
+            const createAnnouncement = new Announcement({
+                title,
+                details
+            })
+
+            createAnnouncement.save()
+
+            return createAnnouncement
             
         } catch (err) {
             return err
