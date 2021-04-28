@@ -17,7 +17,6 @@ export const root = {
     loginUser: async (args: Iuser) => {
 
         const {email, password} = args
-        console.log(email, password)
 
         try {
 
@@ -87,6 +86,20 @@ export const root = {
 
     },
 
+    oneUser: async (args: {userID: string}) => {
+
+        const { userID } = args
+
+        const foundUser = await User.findOne({_id: userID})
+        
+        if (!foundUser) {
+            throw new Error ('No user found.')
+        }
+
+        return foundUser
+
+    },
+
     // Mutations
     createUser: async (args: Iuser) => {
 
@@ -115,9 +128,9 @@ export const root = {
             const hashedPassword = await hash(password, 10)
 
             const newUser = new User({
-                firstName,
-                middleName,
-                lastName,
+                firstName: firstName.toUpperCase(),
+                middleName: middleName.toUpperCase(),
+                lastName: lastName.toUpperCase(),
                 email,
                 password: hashedPassword,
                 role: UserRole.STUDENT

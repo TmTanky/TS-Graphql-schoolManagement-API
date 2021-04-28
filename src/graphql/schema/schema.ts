@@ -6,6 +6,7 @@ export const schema = buildSchema(`
         allUsers: [userInfo]
         allSubjects: [subject]
         allAnnouncements: [announcement]
+        oneUser(userID: ID!): userInfo
     }
 
     type announcement {
