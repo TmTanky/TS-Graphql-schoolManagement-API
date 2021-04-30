@@ -100,6 +100,22 @@ export const root = {
 
     },
 
+    oneSubject: async (args: {subjectID: string}) => {
+
+        const { subjectID } = args
+
+        try {
+
+            const foundSubject = await Subject.findOne({_id: subjectID}).populate('studentsWhoTake')
+
+            return foundSubject
+            
+        } catch (err) {
+            return err
+        }
+
+    },
+
     // Mutations
     createUser: async (args: Iuser) => {
 
@@ -161,6 +177,30 @@ export const root = {
             }, {new: true})
 
             return changeRole
+            
+        } catch (err) {
+            return err
+        }
+
+    },
+
+    editUsersName: async (args: {userID: string, firstName: string, middleName: string, lastName: string}) => {
+
+        const {userID, firstName, lastName, middleName} = args
+
+        try {
+
+            if (firstName === "" || middleName === "" || lastName === "") {
+                throw new Error ('Please fill all inputs.')
+            }
+
+            const foundUser = await User.findOneAndUpdate({_id: userID}, {
+                firstName: firstName.toUpperCase(),
+                middleName: middleName.toUpperCase(),
+                lastName: lastName.toUpperCase()
+            }, {new: true})
+
+            return foundUser
             
         } catch (err) {
             return err

@@ -7,6 +7,7 @@ export const schema = buildSchema(`
         allSubjects: [subject]
         allAnnouncements: [announcement]
         oneUser(userID: ID!): userInfo
+        oneSubject(subjectID: ID!): subject
     }
 
     type announcement {
@@ -46,6 +47,13 @@ export const schema = buildSchema(`
         userChangeRole(
             personID: ID!
             newRole: String!
+        ): userInfo
+
+        editUsersName(
+            userID: ID!
+            firstName: String!
+            middleName: String!
+            lastName: String!
         ): userInfo
 
         createSubject(
