@@ -23,7 +23,13 @@ const userSchema = new mongoose.Schema({
             ref: 'Subject'
         }
     ],
-    role: String
+    role: String,
+    instructorsSubjects: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Subject'
+        }
+    ]
 }, { timestamps: true })
 
 export const User = mongoose.model<Iuser>('User', userSchema)

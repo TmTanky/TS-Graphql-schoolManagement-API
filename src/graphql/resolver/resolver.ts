@@ -62,7 +62,7 @@ export const root = {
 
         try {
 
-            const allSubjects = await Subject.find({}).populate('studentsWhoTake')
+            const allSubjects = await Subject.find({}).populate('studentsWhoTake').populate('instructor')
 
             return allSubjects
             
@@ -90,7 +90,10 @@ export const root = {
 
         const { userID } = args
 
-        const foundUser = await User.findOne({_id: userID})
+        const foundUser = await User.findOne({_id: userID}).populate('instructorsSubjects').populate('subjects').populate({
+            path: 'instructorsSubjects',
+            populate: 'studentsWhoTake'
+        })
         
         if (!foundUser) {
             throw new Error ('No user found.')
@@ -106,7 +109,7 @@ export const root = {
 
         try {
 
-            const foundSubject = await Subject.findOne({_id: subjectID}).populate('studentsWhoTake')
+            const foundSubject = await Subject.findOne({_id: subjectID}).populate('studentsWhoTake').populate('instructor')
 
             return foundSubject
             
@@ -272,6 +275,48 @@ export const root = {
 
             return toBeDeleted
 
+            
+        } catch (err) {
+            return err
+        }
+
+    },
+
+    assignInstructor: async (args: {instructorID: Iuser, subjectID: Isubject}) => {
+
+        const { instructorID, subjectID } = args
+
+        try {
+
+            const currentInstructor = await Subject.findOne({_id: subjectID}).populate('instructor')
+            const oldInstructor = currentInstructor?.instructor._id
+
+            console.log(instructorID)
+            console.log(oldInstructor)
+
+            if (oldInstructor == instructorID) {
+                return currentInstructor
+            } else {
+
+                await User.findOneAndUpdate({_id: oldInstructor}, {
+                    $pull: {
+                        instructorsSubjects: subjectID
+                    }
+                })
+
+                await User.findOneAndUpdate({_id: instructorID}, {
+                    $addToSet: {
+                        instructorsSubjects: subjectID
+                    }
+                }) 
+
+                const newInstructor = await Subject.findOneAndUpdate({_id: subjectID}, {
+                    instructor: instructorID
+                }, {new: true}).populate('instructor')
+
+                return newInstructor
+
+            }
             
         } catch (err) {
             return err

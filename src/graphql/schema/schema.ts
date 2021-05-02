@@ -24,12 +24,14 @@ export const schema = buildSchema(`
         email: String!
         role: String!
         subjects: [subject]
+        instructorsSubjects: [subject]
     }
 
     type subject {
         _id: ID!
         name: String!
         description: String!
+        instructor: userInfo
         studentsWhoTake: [userInfo]
     }
 
@@ -65,6 +67,11 @@ export const schema = buildSchema(`
             subjectID: ID!
             newName: String!
             newDescription: String!
+        ): subject
+
+        assignInstructor(
+            subjectID: ID!
+            instructorID: ID!
         ): subject
 
         deleteSubject(subjectID: ID!) : subject

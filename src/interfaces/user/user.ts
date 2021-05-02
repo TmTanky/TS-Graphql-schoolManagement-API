@@ -8,13 +8,14 @@ export enum UserRole {
 }
 
 export interface Iuser extends Document {
-    firstName: string;
-    middleName: string;
-    lastName: string;
-    email: string;
-    password: string;
+    firstName: string
+    middleName: string
+    lastName: string
+    email: string
+    password: string
     passwordConfirm: string
-    courseEnrolled: string;
-    subjects: Isubject[];
+    courseEnrolled: string
+    subjects: Isubject[]
     role: UserRole
+    instructorsSubjects: Isubject[]
 }
