@@ -4,6 +4,7 @@ import { hash, compare } from 'bcrypt'
 import { User } from '../../models/user/user'
 import { Subject } from '../../models/subjects/subjects'
 import { Announcement } from '../../models/announcement/announcement'
+import { Concern } from '../../models/concern/concern'
 
 // Interfaces
 import { Iuser, UserRole } from "../../interfaces/user/user"
@@ -86,6 +87,20 @@ export const root = {
 
     },
 
+    allConcerns: async () => {
+
+        try {
+
+            const allConcerns = await Concern.find({}).populate('ticketBy')
+
+            return allConcerns
+            
+        } catch (err) {
+            return err
+        }
+        
+    },
+
     oneUser: async (args: {userID: string}) => {
 
         const { userID } = args
@@ -112,6 +127,22 @@ export const root = {
             const foundSubject = await Subject.findOne({_id: subjectID}).populate('studentsWhoTake').populate('instructor')
 
             return foundSubject
+            
+        } catch (err) {
+            return err
+        }
+
+    },
+    
+    oneTicket: async (args: {ticketID: string}) => {
+
+        const { ticketID } = args
+
+        try {
+
+            const foundTicket = await Concern.findOne({_id: ticketID }).populate('ticketBy')
+
+            return foundTicket
             
         } catch (err) {
             return err
@@ -288,11 +319,38 @@ export const root = {
 
         try {
 
+            await User.findOneAndUpdate({_id: instructorID}, {
+                $addToSet: {
+                    instructorsSubjects: subjectID
+                }
+            }) 
+
+            const newInstructor = await Subject.findOneAndUpdate({_id: subjectID}, {
+                instructor: instructorID
+            }, {new: true}).populate('instructor')
+
+            return newInstructor
+            
+        } catch (err) {
+            return err
+        }
+
+    },
+
+    reAssignInstructor: async (args: {instructorID: Iuser, subjectID: Isubject}) => {
+
+        const { instructorID, subjectID } = args
+        console.log(instructorID)
+        console.log(subjectID)
+
+        try {
+
             const currentInstructor = await Subject.findOne({_id: subjectID}).populate('instructor')
             const oldInstructor = currentInstructor?.instructor._id
 
-            console.log(instructorID)
-            console.log(oldInstructor)
+            if (!currentInstructor) {
+                console.log('alaws nga')
+            }
 
             if (oldInstructor == instructorID) {
                 return currentInstructor
@@ -397,6 +455,65 @@ export const root = {
             createAnnouncement.save()
 
             return createAnnouncement
+            
+        } catch (err) {
+            return err
+        }
+
+    },
+
+    createConcern: async (args: {title: string, concern: string, userID: Iuser}) => {
+
+        const { title, concern, userID } = args
+
+        try {
+
+            const newConcern = new Concern({
+                title,
+                concern,
+                isResolved: false,
+                ticketBy: userID
+            })
+
+            await newConcern.save()
+
+            return newConcern
+            
+        } catch (err) {
+            return err
+        }
+
+    },
+
+    concernDone: async (args: {ticketID: string}) => {
+
+        const {ticketID} = args
+
+        try {
+
+            const foundTicket = await Concern.findOneAndUpdate({_id: ticketID}, {
+                isResolved: true
+            }, {new: true})
+            
+            return foundTicket
+
+        } catch (err) {
+            return err
+        }
+
+    },
+
+    concernUndo: async (args: {ticketID: string}) => {
+
+        const {ticketID} = args
+
+        try {
+
+            const foundTicket = await Concern.findOneAndUpdate({_id: ticketID}, {
+                isResolved: false
+            }, {new: true})
+
+            return foundTicket
             
         } catch (err) {
             return err

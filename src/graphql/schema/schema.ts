@@ -6,8 +6,10 @@ export const schema = buildSchema(`
         allUsers: [userInfo]
         allSubjects: [subject]
         allAnnouncements: [announcement]
+        allConcerns: [concern]
         oneUser(userID: ID!): userInfo
         oneSubject(subjectID: ID!): subject
+        oneTicket(ticketID: ID!): concern
     }
 
     type announcement {
@@ -33,6 +35,14 @@ export const schema = buildSchema(`
         description: String!
         instructor: userInfo
         studentsWhoTake: [userInfo]
+    }
+
+    type concern {
+        _id: ID!
+        title: String!
+        concern: String!
+        isResolved: Boolean!
+        ticketBy: userInfo
     }
 
     type Mutation {
@@ -74,6 +84,11 @@ export const schema = buildSchema(`
             instructorID: ID!
         ): subject
 
+        reAssignInstructor(
+            subjectID: ID!
+            instructorID: ID!
+        ): subject
+
         deleteSubject(subjectID: ID!) : subject
 
         studentTakeSubject(
@@ -91,6 +106,19 @@ export const schema = buildSchema(`
             details: String!
         ): announcement
 
+        createConcern(
+            userID: ID!
+            title: String!
+            concern: String!
+        ): concern
+
+        concernDone(
+            ticketID: ID!
+        ): concern
+
+        concernUndo(
+            ticketID: ID!
+        ): concern
 
     }
 `)
