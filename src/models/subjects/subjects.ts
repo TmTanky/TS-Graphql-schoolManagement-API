@@ -10,7 +10,7 @@ const subjectSchema = new mongoose.Schema({
     },
     description: String,
     instructor: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId || null,
         ref: 'User'
     },
     studentsWhoTake: [

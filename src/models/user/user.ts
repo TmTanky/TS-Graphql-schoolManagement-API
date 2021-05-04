@@ -29,6 +29,12 @@ const userSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Subject'
         }
+    ],
+    myTickets: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Concern'
+        }
     ]
 }, { timestamps: true })
 

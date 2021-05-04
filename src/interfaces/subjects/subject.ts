@@ -4,6 +4,6 @@ import { Iuser } from '../user/user';
 export interface Isubject extends Document {
     name: string
     description: string
-    instructor: Iuser
+    instructor: Iuser | null
     studentsWhoTake: Iuser[]
 }

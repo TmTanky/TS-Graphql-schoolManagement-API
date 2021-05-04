@@ -1,4 +1,5 @@
 import {Document} from 'mongoose'
+import { Iconcern } from '../concern/concern';
 import { Isubject } from '../subjects/subject';
 
 export enum UserRole {
@@ -18,4 +19,5 @@ export interface Iuser extends Document {
     subjects: Isubject[]
     role: UserRole
     instructorsSubjects: Isubject[]
+    myTickets: Iconcern[]
 }

@@ -27,6 +27,7 @@ export const schema = buildSchema(`
         role: String!
         subjects: [subject]
         instructorsSubjects: [subject]
+        myTickets: [concern]
     }
 
     type subject {
@@ -71,6 +72,7 @@ export const schema = buildSchema(`
         createSubject(
             name: String!
             description: String!
+            instructor: ID
         ): subject
 
         editSubject(
@@ -80,11 +82,6 @@ export const schema = buildSchema(`
         ): subject
 
         assignInstructor(
-            subjectID: ID!
-            instructorID: ID!
-        ): subject
-
-        reAssignInstructor(
             subjectID: ID!
             instructorID: ID!
         ): subject
