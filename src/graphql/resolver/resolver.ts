@@ -260,6 +260,12 @@ export const root = {
                 })
         
                 await newSubject.save()
+
+                await User.findOneAndUpdate({_id: instructor}, {
+                    $addToSet: {
+                        instructorsSubjects: newSubject._id
+                    }
+                })
         
                 return newSubject
 
@@ -272,6 +278,12 @@ export const root = {
                 })
         
                 await newSubject.save()
+
+                await User.findOneAndUpdate({_id: instructor}, {
+                    $addToSet: {
+                        instructorsSubjects: newSubject._id
+                    }
+                })
         
                 return newSubject
             }
